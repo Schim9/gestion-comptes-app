@@ -19,8 +19,8 @@ export class DiagnosticService {
   }
 
   checkHealth(baseUrl?: string): Observable<DiagResult> {
-    return this.http.get(`${this.apiUrl(baseUrl)}/health`).pipe(
-      map(() => ({ ok: true })),
+    return this.http.get<{ status: string }>(`${this.apiUrl(baseUrl)}/status`).pipe(
+      map(r => r.status === 'up' ? { ok: true } : { ok: false, message: 'Serveur dégradé' }),
       catchError(err => of({ ok: false, message: `Serveur inaccessible (${err.status || err.message})` }))
     );
   }
@@ -33,10 +33,10 @@ export class DiagnosticService {
   }
 
   checkSheets(baseUrl?: string): Observable<DiagResult> {
-    return this.http.get<{ status: string; message?: string }>(`${this.apiUrl(baseUrl)}/diagnostic/sheets`).pipe(
-      map(r => r.status === 'OK'
+    return this.http.get<{ anomalies: string[] }>(`${this.apiUrl(baseUrl)}/status`).pipe(
+      map(r => r.anomalies.length === 0
         ? { ok: true }
-        : { ok: false, message: r.message ?? 'Erreur Google Sheets' }),
+        : { ok: false, message: r.anomalies[0] }),
       catchError(err => of({ ok: false, message: `Erreur Google Sheets (${err.status})` }))
     );
   }

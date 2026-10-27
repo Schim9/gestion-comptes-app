@@ -16,7 +16,7 @@ src/app/
 │   ├── auth.guard.ts           canActivate → /login si pas de token
 │   ├── auth.interceptor.ts     ajoute Bearer + redirect 401/403
 │   ├── config.service.ts       URL API : localStorage['api_url'] en priorité, puis environment.apiUrl
-│   ├── diagnostic.service.ts   3 checks HTTP séquentiels
+│   ├── diagnostic.service.ts   3 checks HTTP séquentiels sur GET /api/status
 │   ├── sheets.service.ts       appels REST months
 │   ├── models.ts               Operation, MonthData, OperationRequest…
 │   └── month-utils.ts

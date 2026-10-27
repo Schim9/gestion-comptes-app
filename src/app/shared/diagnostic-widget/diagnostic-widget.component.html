@@ -1,0 +1,18 @@
+@for (check of checks; track check.label) {
+  <div class="diag-row">
+    <span class="diag-icon" [class]="check.status">
+      @switch (check.status) {
+        @case ('loading') { <span class="spinner"></span> }
+        @case ('ok')      { ✓ }
+        @case ('error')   { ✗ }
+        @default          { ○ }
+      }
+    </span>
+    <div class="diag-info">
+      <span class="diag-label">{{ check.label }}</span>
+      @if (check.message) {
+        <span class="diag-msg">{{ check.message }}</span>
+      }
+    </div>
+  </div>
+}

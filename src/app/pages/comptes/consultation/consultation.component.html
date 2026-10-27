@@ -1,0 +1,234 @@
+@if (monthData(); as data) {
+
+  <!-- Sélecteur de compte -->
+  <div class="compte-filter">
+    <button class="filter-btn ccm"   [class.active]="filterCCM()"    (click)="toggleCCM()">CCM</button>
+    <button class="filter-btn bourso" [class.active]="filterBourso()" (click)="toggleBourso()">Boursorama</button>
+  </div>
+
+  <!-- Cartes soldes -->
+  <div class="soldes">
+    @if (compteFilter() !== 'Boursorama') {
+      <div class="solde-card">
+        <div class="account-name">CCM</div>
+        <div class="solde-row">
+          <span class="label">Réel</span>
+          <span class="amount" [class.negative]="data.soldeReelCCM < 0">
+            {{ data.soldeReelCCM | number:'1.2-2' }} €
+          </span>
+        </div>
+        <hr />
+        <div class="solde-row">
+          <span class="label">Fin de mois</span>
+          <span class="amount"
+                [class.negative]="data.soldePrevCCM < 0"
+                [class.low]="data.soldePrevCCM >= 0 && data.soldePrevCCM < 200"
+                [class.good]="data.soldePrevCCM >= 200">
+            {{ data.soldePrevCCM | number:'1.2-2' }} €
+          </span>
+        </div>
+      </div>
+    }
+
+    @if (compteFilter() !== 'CCM') {
+      <div class="solde-card">
+        <div class="account-name">Boursorama</div>
+        <div class="solde-row">
+          <span class="label">Réel</span>
+          <span class="amount" [class.negative]="data.soldeReelBoursorama < 0">
+            {{ data.soldeReelBoursorama | number:'1.2-2' }} €
+          </span>
+        </div>
+        <hr />
+        <div class="solde-row">
+          <span class="label">Fin de mois</span>
+          <span class="amount"
+                [class.negative]="data.soldePrevBoursorama < 0"
+                [class.low]="data.soldePrevBoursorama >= 0 && data.soldePrevBoursorama < 200"
+                [class.good]="data.soldePrevBoursorama >= 200">
+            {{ data.soldePrevBoursorama | number:'1.2-2' }} €
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Section opérations réelles -->
+  <div class="ops-card">
+    <button class="section-header" (click)="showReelles.set(!showReelles())">
+      <span class="header-left">
+        <h3>Opérations réelles</h3>
+        <span class="badge green">réalisées</span>
+      </span>
+      <span class="chevron" [class.open]="showReelles()">›</span>
+    </button>
+    @if (showReelles()) {
+      <div class="ops-table">
+        <div class="ops-thead">
+          <div class="ops-thead-meta">
+            <span class="col-date">Jour</span>
+            <span>Libellé</span>
+          </div>
+          <div class="ops-thead-accounts" [class.single]="compteFilter() !== 'both'">
+            <span></span>
+            @if (compteFilter() !== 'Boursorama') {
+              <span><span class="compte-badge ccm">CCM</span></span>
+            }
+            @if (compteFilter() !== 'CCM') {
+              <span><span class="compte-badge boursorama">Boursorama</span></span>
+            }
+          </div>
+        </div>
+        @if (reellesSorted().length === 0) {
+          <div class="empty">Aucune opération</div>
+        }
+        @for (op of reellesSorted(); track op.ligne) {
+          <div class="ops-row" [class.single]="compteFilter() !== 'both'">
+            <div class="ops-row-title">
+              <span class="col-date">{{ op.date ?? '—' }}</span>
+              <span class="col-lib">{{ op.libelle }}</span>
+            </div>
+            <div class="ops-row-amounts" [class.single]="compteFilter() !== 'both'">
+              <span></span>
+              @if (compteFilter() !== 'Boursorama') {
+                <span class="col-ccm">
+                  @if (op.compte === 'CCM') {
+                    <span [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">{{ op.montant | number:'1.2-2' }}</span>
+                  }
+                </span>
+              }
+              @if (compteFilter() !== 'CCM') {
+                <span class="col-bourso">
+                  @if (op.compte === 'Boursorama') {
+                    <span [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">{{ op.montant | number:'1.2-2' }}</span>
+                  }
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Section mouvements à venir -->
+  <div class="ops-card">
+    <button class="section-header" (click)="showAVenir.set(!showAVenir())">
+      <span class="header-left">
+        <h3>Mouvements à venir</h3>
+        <span class="badge orange">à venir</span>
+      </span>
+      <span class="chevron" [class.open]="showAVenir()">›</span>
+    </button>
+    @if (showAVenir()) {
+      <div class="ops-table">
+        <div class="ops-thead">
+          <div class="ops-thead-meta">
+            <span>Libellé</span>
+          </div>
+          <div class="ops-thead-accounts" [class.single]="compteFilter() !== 'both'">
+            <span></span>
+            @if (compteFilter() !== 'Boursorama') {
+              <span><span class="compte-badge ccm">CCM</span></span>
+            }
+            @if (compteFilter() !== 'CCM') {
+              <span><span class="compte-badge boursorama">Boursorama</span></span>
+            }
+          </div>
+        </div>
+        @if (opsAVenir().length === 0) {
+          <div class="empty">Aucune opération</div>
+        }
+        @for (op of opsAVenir(); track op.ligne) {
+          <div class="ops-row" [class.single]="compteFilter() !== 'both'">
+            <div class="ops-row-title">
+              <span class="col-date">—</span>
+              <span class="col-lib">{{ op.libelle }}</span>
+            </div>
+            <div class="ops-row-amounts" [class.single]="compteFilter() !== 'both'">
+              <span></span>
+              @if (compteFilter() !== 'Boursorama') {
+                <span class="col-ccm">
+                  @if (op.compte === 'CCM') {
+                    <span [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">{{ op.montant | number:'1.2-2' }}</span>
+                  }
+                </span>
+              }
+              @if (compteFilter() !== 'CCM') {
+                <span class="col-bourso">
+                  @if (op.compte === 'Boursorama') {
+                    <span [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">{{ op.montant | number:'1.2-2' }}</span>
+                  }
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- Section mouvements récurrents -->
+  <div class="ops-card">
+    <button class="section-header" (click)="showRecurrent.set(!showRecurrent())">
+      <span class="header-left">
+        <h3>Récurrents</h3>
+        <span class="badge blue">mensuel</span>
+      </span>
+      <span class="chevron" [class.open]="showRecurrent()">›</span>
+    </button>
+    @if (showRecurrent()) {
+      <div class="ops-table">
+        <div class="ops-thead">
+          <div class="ops-thead-meta">
+            <span>Libellé</span>
+          </div>
+          <div class="ops-thead-accounts" [class.single]="compteFilter() !== 'both'">
+            <span></span>
+            @if (compteFilter() !== 'Boursorama') {
+              <span><span class="compte-badge ccm">CCM</span></span>
+            }
+            @if (compteFilter() !== 'CCM') {
+              <span><span class="compte-badge boursorama">Boursorama</span></span>
+            }
+          </div>
+        </div>
+        @if (opsRecurrentes().length === 0) {
+          <div class="empty">Aucune opération récurrente</div>
+        }
+        @for (op of opsRecurrentes(); track op.ligne) {
+          <div class="ops-row" [class.single]="compteFilter() !== 'both'">
+            <div class="ops-row-title">
+              <span class="col-date">—</span>
+              <span class="col-lib">{{ op.libelle }}</span>
+            </div>
+            <div class="ops-row-amounts" [class.single]="compteFilter() !== 'both'">
+              <span></span>
+              @if (compteFilter() !== 'Boursorama') {
+                <span class="col-ccm">
+                  @if (op.compte === 'CCM') {
+                    <span [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">{{ op.montant | number:'1.2-2' }}</span>
+                  }
+                </span>
+              }
+              @if (compteFilter() !== 'CCM') {
+                <span class="col-bourso">
+                  @if (op.compte === 'Boursorama') {
+                    <span [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">{{ op.montant | number:'1.2-2' }}</span>
+                  }
+                </span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+} @else {
+  <div class="empty-state">
+    <span class="icon">📅</span>
+    <h2>Aucune donnée pour ce mois</h2>
+    <p>La première saisie créera automatiquement l'onglet dans le Google Sheet.</p>
+  </div>
+}

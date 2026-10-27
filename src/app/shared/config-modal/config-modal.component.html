@@ -1,0 +1,76 @@
+<div class="overlay" (click)="close()"></div>
+
+<div class="panel">
+  <div class="panel-header">
+    <h2>Configuration</h2>
+    <button class="close-btn" (click)="close()">✕</button>
+  </div>
+
+  <div class="panel-body">
+
+    <!-- Onglet par défaut -->
+    <section>
+      <h3>Onglet par défaut</h3>
+      <div class="field">
+        <select [(ngModel)]="defaultTab" (ngModelChange)="saveDefaultTab()">
+          <option value="consultation">Consulter</option>
+          <option value="saisie">Saisir</option>
+          <option value="pointage">Pointer</option>
+        </select>
+        <p class="hint">Page affichée au lancement de l'application</p>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Serveur -->
+    <section>
+      <h3>Serveur</h3>
+      <div class="field">
+        <label>URL de l'API</label>
+        <input
+          type="text"
+          [(ngModel)]="inputUrl"
+          placeholder="http://192.168.1.x:8080"
+        />
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Identifiant</label>
+          <input type="text" [(ngModel)]="username" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label>Mot de passe</label>
+          <input type="password" [(ngModel)]="password" autocomplete="off" />
+        </div>
+      </div>
+      <div class="url-actions">
+        <button class="btn-save" (click)="saveServer()">Enregistrer</button>
+        @if (isCustom) {
+          <button class="btn-reset" (click)="resetUrl()">Remettre par défaut</button>
+        }
+      </div>
+      @if (serverSaved) {
+        <p class="success">Paramètres enregistrés</p>
+      }
+    </section>
+
+    <hr />
+
+    <!-- Diagnostic -->
+    <section>
+      <h3>Diagnostic</h3>
+      <div class="checks">
+        <app-diagnostic-widget
+          [url]="inputUrl"
+          [username]="username"
+          [password]="password"
+        />
+      </div>
+      <button class="btn-diag" (click)="runDiag()" [disabled]="diagWidget?.diagRunning || !canDiag">
+        {{ diagWidget?.diagRunning ? 'Test en cours…' : 'Lancer le diagnostic' }}
+      </button>
+    </section>
+
+  </div>
+</div>

@@ -1,0 +1,107 @@
+.config-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+}
+
+.config-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+}
+
+h1 {
+  margin: 0 0 1.5rem;
+  font-size: 1.3rem;
+  color: #333;
+  text-align: center;
+}
+
+.field {
+  margin-bottom: 1.25rem;
+}
+
+label {
+  display: block;
+  margin-bottom: .3rem;
+  font-size: .85rem;
+  color: #555;
+  font-weight: 600;
+}
+
+input {
+  width: 100%;
+  padding: .65rem .8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: .9rem;
+  box-sizing: border-box;
+  font-family: monospace;
+}
+
+.hint {
+  margin: .3rem 0 0;
+  font-size: .75rem;
+  color: #aaa;
+
+  &.custom {
+    color: #e65100;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+
+.btn-save {
+  flex: 1;
+  padding: .65rem;
+  background: #83d087;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: .95rem;
+  cursor: pointer;
+}
+
+.btn-reset {
+  padding: .65rem 1rem;
+  background: none;
+  color: #999;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: .85rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #c62828;
+    color: #c62828;
+  }
+}
+
+.success {
+  color: #83d087;
+  font-size: .85rem;
+  text-align: center;
+  margin: 0 0 .75rem;
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  font-size: .85rem;
+  color: #aaa;
+  text-decoration: none;
+  margin-top: .5rem;
+
+  &:hover {
+    color: #83d087;
+  }
+}

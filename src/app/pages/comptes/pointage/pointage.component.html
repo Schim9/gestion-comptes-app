@@ -1,0 +1,90 @@
+<div class="pointage-card">
+  @if (items.length === 0) {
+    <p class="empty">Aucune opération prévisionnelle à pointer</p>
+  } @else {
+    <div class="filter-bar">
+      <input
+        type="text"
+        placeholder="Rechercher un mouvement…"
+        [(ngModel)]="filterText"
+        class="filter-input"
+      />
+    </div>
+
+    <div class="list">
+      @for (item of filteredPendingItems; track item.ligne) {
+        <div class="item" (click)="toggleExpand(item)">
+          <div class="circle">›</div>
+          <div class="info">
+            <span class="libelle">{{ item.libelle }}</span>
+            <span class="compte">{{ item.compte }}</span>
+          </div>
+          <span class="amount" [class.debit]="item.montant < 0" [class.credit]="item.montant > 0">
+            {{ item.montant | number:'1.2-2' }} €
+          </span>
+        </div>
+        @if (expandedLigne === item.ligne) {
+          <div class="date-form" (click)="$event.stopPropagation()">
+            <div class="date-form-fields">
+              <input
+                class="input-libelle"
+                type="text"
+                placeholder="Libellé"
+                [(ngModel)]="inputLibelle"
+              />
+            </div>
+            <div class="date-form-fields">
+              <input
+                class="input-montant"
+                type="number"
+                step="0.01"
+                placeholder="Montant"
+                [(ngModel)]="inputMontant"
+              />
+              <input
+                class="input-date"
+                type="number"
+                min="1"
+                max="31"
+                placeholder="Jour"
+                [(ngModel)]="inputDate"
+              />
+            </div>
+            <label class="checkbox-courses">
+              <input type="checkbox" [(ngModel)]="deduireDesCourses" />
+              Déduire des courses
+            </label>
+            <div class="date-form-actions">
+              <button (click)="pointer(item)" [disabled]="!inputDate || !inputLibelle">Confirmer</button>
+              <button class="cancel" (click)="expandedLigne = null; deduireDesCourses = false">Annuler</button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    @if (pointedItems.length > 0) {
+      <div class="pointed-section">
+        <h4>Pointées</h4>
+        @for (item of pointedItems; track item.ligne) {
+          <div class="item pointed">
+            <div class="circle checked"><span>✓</span></div>
+            <div class="info">
+              <span class="libelle">{{ item.libelle }}</span>
+              <span class="meta">
+                {{ item.compte }}
+                @if (item.type === 'recurrent') {
+                  <span class="badge-rec">récurrent</span>
+                }
+              </span>
+            </div>
+            <span class="amount" [class.debit]="item.montant < 0" [class.credit]="item.montant > 0">
+              {{ item.montant | number:'1.2-2' }} €
+            </span>
+            <span class="pointed-label">✓ Basculé en opération réelle</span>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

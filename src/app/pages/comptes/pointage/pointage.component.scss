@@ -1,0 +1,192 @@
+.pointage-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+}
+
+.filter-bar {
+  margin-bottom: .75rem;
+}
+
+.filter-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: .45rem .75rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: .9rem;
+  color: #333;
+
+  &:focus {
+    outline: none;
+    border-color: #83d087;
+  }
+}
+
+.empty {
+  color: #bbb;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem 0;
+  border-bottom: 1px solid #f5f5f5;
+  cursor: pointer;
+  position: relative;
+}
+
+.circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all .2s;
+  font-size: 1rem;
+  color: #bbb;
+}
+
+.circle.checked {
+  border-color: #83d087;
+  background: #83d087;
+  color: white;
+  font-size: .8rem;
+}
+
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.libelle {
+  font-size: .95rem;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .75rem;
+  color: #999;
+}
+
+.badge-rec {
+  font-size: .65rem;
+  padding: .1rem .35rem;
+  border-radius: 10px;
+  background: #e3f2fd;
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.amount {
+  font-weight: 600;
+  flex-shrink: 0;
+  font-size: .9rem;
+}
+
+.debit  { color: #c62828; }
+.credit { color: #83d087; }
+
+.date-form {
+  padding: .5rem 0 .75rem 2.5rem;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.date-form-fields {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: .5rem;
+
+  input {
+    padding: .4rem .6rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: .9rem;
+  }
+
+  .input-libelle {
+    flex: 1;
+  }
+
+  .input-montant {
+    width: 90px;
+  }
+
+  .input-date {
+    width: 80px;
+  }
+}
+
+.checkbox-courses {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .85rem;
+  color: #555;
+  margin-bottom: .5rem;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    accent-color: #83d087;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+}
+
+.date-form-actions {
+  display: flex;
+  gap: .5rem;
+
+  button {
+    padding: .4rem .8rem;
+    border: none;
+    border-radius: 8px;
+    font-size: .85rem;
+    cursor: pointer;
+    background: #83d087;
+    color: white;
+
+    &:disabled {
+      background: #aaa;
+      cursor: default;
+    }
+  }
+
+  .cancel {
+    background: none;
+    color: #999;
+    border: 1px solid #ddd;
+  }
+}
+
+.pointed {
+  opacity: .45;
+  cursor: default;
+  border-left: 3px solid #83d087;
+  padding-left: .5rem;
+}
+
+.pointed-label {
+  font-size: .7rem;
+  color: #83d087;
+  position: absolute;
+  right: 0;
+  bottom: .3rem;
+}
+
+.pointed-section h4 {
+  font-size: .85rem;
+  color: #999;
+  margin: 1rem 0 .5rem;
+}

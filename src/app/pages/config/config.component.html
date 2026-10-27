@@ -1,0 +1,65 @@
+<div class="config-wrapper">
+  <div class="config-card">
+    <h1>Paramètres</h1>
+
+    <div class="field">
+      <label>Identifiant</label>
+      <input
+        type="text"
+        [value]="inputUsername"
+        (input)="inputUsername = $any($event.target).value"
+        placeholder="Identifiant de connexion"
+        autocomplete="username"
+      />
+    </div>
+
+    <div class="field">
+      <label>Mot de passe</label>
+      <input
+        type="password"
+        [value]="inputPassword"
+        (input)="inputPassword = $any($event.target).value"
+        placeholder="Mot de passe"
+        autocomplete="current-password"
+      />
+    </div>
+
+    <div class="field">
+      <label>URL du serveur</label>
+      <input
+        type="text"
+        [value]="inputUrl"
+        (input)="inputUrl = $any($event.target).value"
+        placeholder="http://192.168.1.x:8080"
+      />
+      @if (isCustom) {
+        <p class="hint custom">URL personnalisée — valeur par défaut : {{ defaultUrl }}</p>
+      } @else {
+        <p class="hint">Valeur par défaut (environment.ts)</p>
+      }
+    </div>
+
+    <div class="field">
+      <label>Onglet par défaut</label>
+      <select [(ngModel)]="inputDefaultTab" name="defaultTab">
+        <option value="consultation">Consulter</option>
+        <option value="saisie">Saisir</option>
+        <option value="pointage">Pointer</option>
+      </select>
+      <p class="hint">Page affichée au lancement de l'application</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn-save" (click)="save()">Enregistrer</button>
+      @if (isCustom) {
+        <button class="btn-reset" (click)="reset()">Remettre par défaut</button>
+      }
+    </div>
+
+    @if (saved) {
+      <p class="success">Paramètres enregistrés</p>
+    }
+
+    <a class="back-link" routerLink="/login">← Retour à la connexion</a>
+  </div>
+</div>

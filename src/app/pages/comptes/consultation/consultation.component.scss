@@ -1,0 +1,241 @@
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #999;
+}
+
+.empty-state .icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+  color: #555;
+}
+
+/* Sélecteur de compte */
+.compte-filter {
+  display: flex;
+  gap: .5rem;
+  margin-bottom: 1rem;
+}
+
+.filter-btn {
+  flex: 1;
+  padding: .4rem .5rem;
+  border-radius: 20px;
+  border: 1.5px solid #ddd;
+  background: white;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #aaa;
+  cursor: pointer;
+  transition: all .15s ease;
+
+  &.active       { border-color: #83d087; color: #83d087; background: #f1fbf1; }
+  &.ccm.active   { border-color: #003189; color: #003189; background: #e8edf7; }
+  &.bourso.active { border-color: #c2006f; color: #c2006f; background: #fce4f3; }
+}
+
+/* Cartes soldes */
+.soldes {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.solde-card {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  padding: .85rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+}
+
+.account-name {
+  font-variant: small-caps;
+  font-size: .75rem;
+  color: #888;
+  margin-bottom: .4rem;
+}
+
+.solde-row {
+  display: flex;
+  flex-direction: column;
+  margin: .3rem 0;
+}
+
+.label {
+  font-size: .72rem;
+  color: #888;
+}
+
+.amount {
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.amount.negative { color: #c62828; }
+.amount.low      { color: #e65100; }
+.amount.good     { color: #83d087; }
+
+hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: .4rem 0;
+}
+
+/* Tableaux d'opérations */
+.ops-card {
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+  overflow: hidden;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: .75rem .85rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.section-header:hover {
+  background: #fafafa;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: .95rem;
+}
+
+.badge {
+  font-size: .68rem;
+  padding: .15rem .45rem;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.badge.green  { background: #e8f5e9; color: #83d087; }
+.badge.orange { background: #fff3e0; color: #e65100; }
+.badge.blue   { background: #e3f2fd; color: #1565c0; }
+
+.chevron {
+  font-size: 1.3rem;
+  color: #bbb;
+  line-height: 1;
+  transform: rotate(90deg);
+  transition: transform .2s ease;
+}
+
+.chevron.open {
+  transform: rotate(-90deg);
+}
+
+.ops-table {
+  font-size: .82rem;
+  padding: 0 .85rem .6rem;
+}
+
+/* Header tableau */
+.ops-thead {
+  padding: .2rem .1rem .3rem;
+  border-bottom: 2px solid #eee;
+  margin-bottom: .1rem;
+}
+
+.ops-thead-meta {
+  display: flex;
+  gap: .5rem;
+  font-size: .7rem;
+  font-weight: 600;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  margin-bottom: .3rem;
+}
+
+.ops-thead-accounts {
+  display: grid;
+  grid-template-columns: 2rem 1fr 1fr;
+  gap: .5rem;
+
+  > span { text-align: right; }
+
+  &.single { grid-template-columns: 2rem 1fr; }
+}
+
+/* Lignes d'opérations */
+.ops-row {
+  padding: .45rem .1rem;
+  border-bottom: 1px solid #f5f5f5;
+
+  &.single {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+
+    .ops-row-title { flex: 1; margin-bottom: 0; }
+
+    .ops-row-amounts {
+      display: flex;
+
+      > span:first-child { display: none; } // masque le spacer date
+
+      .col-ccm, .col-bourso { white-space: nowrap; }
+    }
+  }
+}
+
+.ops-row:last-child {
+  border-bottom: none;
+}
+
+.ops-row-title {
+  display: flex;
+  gap: .5rem;
+  align-items: baseline;
+  margin-bottom: .2rem;
+}
+
+.ops-row-amounts {
+  display: grid;
+  grid-template-columns: 2rem 1fr 1fr;
+  gap: .5rem;
+
+  &.single { grid-template-columns: 2rem 1fr; }
+}
+
+.col-date { color: #aaa; font-size: .78rem; flex-shrink: 0; width: 2rem; }
+.col-lib  { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #333; min-width: 0; }
+.col-ccm, .col-bourso { text-align: right; font-weight: 600; white-space: nowrap; }
+
+/* Pastilles compte */
+.compte-badge {
+  display: inline-block;
+  font-size: .6rem;
+  font-weight: 600;
+  padding: .1rem .4rem;
+  border-radius: 10px;
+
+  &.ccm        { background: #e8edf7; color: #003189; }
+  &.boursorama { background: #fce4f3; color: #c2006f; }
+}
+
+.debit  { color: #c62828; }
+.credit { color: #83d087; }
+.empty  { color: #ccc; font-size: .85rem; text-align: center; padding: .5rem 0; }

@@ -1,0 +1,57 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+
+.diag-row {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+}
+
+.diag-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .85rem;
+  flex-shrink: 0;
+  margin-top: .1rem;
+
+  &.idle    { color: #bbb; }
+  &.loading { color: #999; }
+  &.ok      { color: #83d087; font-weight: 700; }
+  &.error   { color: #c62828; font-weight: 700; }
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ddd;
+  border-top-color: #83d087;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.diag-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.diag-label {
+  font-size: .85rem;
+  color: #444;
+}
+
+.diag-msg {
+  font-size: .75rem;
+  color: #c62828;
+  margin-top: .1rem;
+}

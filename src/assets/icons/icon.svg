@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="117" fill="#6AAF47"/>
+  <text x="182" y="320" text-anchor="middle" font-family="Georgia, serif" font-size="267" font-weight="700" fill="white">€</text>
+  <text x="374" y="384" text-anchor="middle" font-family="Georgia, serif" font-size="149" font-weight="700" fill="rgba(255,255,255,0.7)">K</text>
+</svg>

@@ -1,0 +1,132 @@
+<div class="edition-card" [class.has-drawer]="selectedOperation">
+
+  <!-- Filtre -->
+  <div class="filter-bar">
+    <input
+      type="text"
+      placeholder="Rechercher une opération…"
+      [(ngModel)]="filterText"
+      class="filter-input"
+    />
+  </div>
+
+  <!-- Opérations réelles -->
+  <section class="group">
+    <h3 class="group-title">Opérations réelles</h3>
+    @if (filteredReelles.length === 0) {
+      <p class="empty">Aucune opération réelle</p>
+    } @else {
+      @for (op of filteredReelles; track op.ligne) {
+        <div class="item" [class.selected]="selectedOperation?.ligne === op.ligne" (click)="selectOperation(op)">
+          <div class="info">
+            <span class="libelle">{{ op.libelle }}</span>
+            <span class="meta">{{ op.compte }} · jour {{ op.date }}</span>
+          </div>
+          <span class="amount" [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">
+            {{ op.montant | number:'1.2-2' }} €
+          </span>
+        </div>
+      }
+    }
+  </section>
+
+  <!-- Mouvements à venir -->
+  <section class="group">
+    <h3 class="group-title">Mouvements à venir</h3>
+    @if (filteredAVenir.length === 0) {
+      <p class="empty">Aucun mouvement à venir</p>
+    } @else {
+      @for (op of filteredAVenir; track op.ligne) {
+        <div class="item" [class.selected]="selectedOperation?.ligne === op.ligne" (click)="selectOperation(op)">
+          <div class="info">
+            <span class="libelle">{{ op.libelle }}</span>
+            <span class="meta">{{ op.compte }}</span>
+          </div>
+          <span class="amount" [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">
+            {{ op.montant | number:'1.2-2' }} €
+          </span>
+        </div>
+      }
+    }
+  </section>
+
+</div>
+
+<!-- Drawer fixe en bas -->
+@if (selectedOperation) {
+  <div class="edit-drawer" (click)="$event.stopPropagation()">
+    <div class="drawer-header">
+      <span class="drawer-title">{{ selectedOperation.libelle }}</span>
+      <button class="drawer-close" (click)="cancel()">✕</button>
+    </div>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+
+      <div class="field">
+        <label>Libellé *</label>
+        <input formControlName="libelle" type="text" placeholder="Libellé" />
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Sens *</label>
+          <select formControlName="sens">
+            <option value="debit">Débit</option>
+            <option value="credit">Crédit</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Compte *</label>
+          <select formControlName="compte">
+            <option value="CCM">CCM</option>
+            <option value="Boursorama">Boursorama</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Montant * (€)</label>
+          <input formControlName="montant" type="number" min="0" step="0.01" placeholder="0.00" />
+        </div>
+        @if (isReel(selectedOperation)) {
+          <div class="field">
+            <label>Date (jour) *</label>
+            <input formControlName="date" type="number" min="1" max="31" placeholder="ex: 15" />
+          </div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="form.invalid || loading">
+          {{ loading ? 'Enregistrement…' : 'Sauvegarder' }}
+        </button>
+        <button type="button" class="cancel" (click)="cancel()">Annuler</button>
+      </div>
+
+    </form>
+
+    <!-- Zone action destructive -->
+    <div class="danger-zone">
+      @if (confirmAction === null) {
+        @if (isReel(selectedOperation)) {
+          <button class="danger-btn" (click)="requestConfirm('depointer')">
+            ↩ Dépointer
+          </button>
+        } @else {
+          <button class="danger-btn" (click)="requestConfirm('supprimer')">
+            🗑 Supprimer
+          </button>
+        }
+      } @else {
+        <span class="confirm-label">
+          {{ confirmAction === 'supprimer' ? 'Supprimer définitivement ?' : 'Remettre en "à venir" ?' }}
+        </span>
+        <button class="confirm-btn" [disabled]="loading" (click)="confirmAndExecute()">
+          {{ loading ? '…' : 'Confirmer' }}
+        </button>
+        <button class="cancel-confirm-btn" (click)="cancelConfirm()">Non</button>
+      }
+    </div>
+
+  </div>
+}

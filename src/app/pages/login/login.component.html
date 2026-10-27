@@ -1,0 +1,60 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <h1>Comptes Famille</h1>
+
+    @if (loading) {
+      <p class="connecting">Connexion en cours…</p>
+    } @else {
+      <div class="field">
+        <label>URL du serveur</label>
+        <input
+          type="text"
+          [(ngModel)]="inputUrl"
+          placeholder="https://host"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="field">
+        <label>Identifiant</label>
+        <input
+          type="text"
+          [(ngModel)]="inputUsername"
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="field">
+        <label>Mot de passe</label>
+        <input
+          type="password"
+          [(ngModel)]="inputPassword"
+          autocomplete="current-password"
+        />
+      </div>
+
+      @if (error) {
+        <p class="error">{{ error }}</p>
+      }
+
+      <div class="actions">
+        <button class="btn-save" (click)="save()" [disabled]="!inputUsername || !inputPassword">
+          Enregistrer
+        </button>
+        <button class="btn-diag" (click)="runDiag()" [disabled]="diagWidget?.diagRunning">
+          Diagnostic
+        </button>
+      </div>
+
+      @if (diagVisible) {
+        <div class="diag-body">
+          <app-diagnostic-widget
+            [url]="inputUrl"
+            [username]="inputUsername"
+            [password]="inputPassword"
+          />
+        </div>
+      }
+    }
+  </div>
+</div>

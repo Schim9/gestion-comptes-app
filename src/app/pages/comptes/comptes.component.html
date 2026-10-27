@@ -1,0 +1,48 @@
+<div class="app-shell">
+  <header class="topbar">
+    <div class="nav-month">
+      <button class="chevron" (click)="prevMonth()">&#8249;</button>
+      <span class="month-label">{{ monthLabel() }}</span>
+      <button class="chevron" (click)="nextMonth()">&#8250;</button>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" (click)="showConfig.set(true)" title="Configuration">⚙</button>
+      <button class="logout" (click)="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  @if (showConfig()) {
+    <app-config-modal (closed)="showConfig.set(false)" />
+  }
+
+  <nav class="tabs">
+    <button [class.active]="activeTab() === 'consultation'" (click)="setTab('consultation')">Consulter</button>
+    <button [class.active]="activeTab() === 'saisie'" (click)="setTab('saisie')">Saisir</button>
+    <button [class.active]="activeTab() === 'pointage'" (click)="setTab('pointage')">Pointer</button>
+    <button [class.active]="activeTab() === 'edition'" (click)="setTab('edition')">Éditer</button>
+  </nav>
+
+  <main class="content">
+    @if (loading()) {
+      <div class="loader">Chargement…</div>
+    } @else {
+      @if (activeTab() === 'consultation') {
+        <app-consultation [monthData]="monthData()" />
+      }
+      @if (activeTab() === 'saisie') {
+        <app-saisie [monthKey]="currentMonth()" (operationSaisie)="loadMonth()" />
+      }
+      @if (activeTab() === 'pointage') {
+        <app-pointage [monthKey]="currentMonth()" [operations]="monthData()?.operationsPrevisionnelles ?? []" (operationPointee)="loadMonth()" />
+      }
+      @if (activeTab() === 'edition') {
+        <app-edition
+          [monthKey]="currentMonth()"
+          [operationsReelles]="monthData()?.operationsReelles ?? []"
+          [operationsPrevisionnelles]="monthData()?.operationsPrevisionnelles ?? []"
+          (operationModifiee)="loadMonth()" />
+      }
+    }
+  </main>
+</div>
+<app-toast />

@@ -1,18 +1,18 @@
 <div class="pointage-card">
-  @if (items.length === 0) {
+  @if (items().length === 0) {
     <p class="empty">Aucune opération prévisionnelle à pointer</p>
   } @else {
     <div class="filter-bar">
       <input
         type="text"
         placeholder="Rechercher un mouvement…"
-        [(ngModel)]="filterText"
+        [ngModel]="filterText()" (ngModelChange)="filterText.set($event)"
         class="filter-input"
       />
     </div>
 
     <div class="list">
-      @for (item of filteredPendingItems; track item.ligne) {
+      @for (item of filteredPendingItems(); track item.ligne) {
         <div class="item" (click)="toggleExpand(item)">
           <div class="circle">›</div>
           <div class="info">
@@ -50,23 +50,30 @@
                 [(ngModel)]="inputDate"
               />
             </div>
-            <label class="checkbox-courses">
-              <input type="checkbox" [(ngModel)]="deduireDesCourses" />
-              Déduire des courses
-            </label>
-            <div class="date-form-actions">
-              <button (click)="pointer(item)" [disabled]="!inputDate || !inputLibelle">Confirmer</button>
-              <button class="cancel" (click)="expandedLigne = null; deduireDesCourses = false">Annuler</button>
-            </div>
+            @if (!confirmTransfert) {
+              <div class="date-form-actions">
+                <button (click)="pointer(item)" [disabled]="!inputDate || !inputLibelle">Confirmer</button>
+                @if (item.type === 'a_venir') {
+                  <button class="transfer-btn" (click)="confirmTransfert = true">→ Mois suivant</button>
+                }
+                <button class="cancel" (click)="expandedLigne = null">Annuler</button>
+              </div>
+            } @else {
+              <div class="date-form-actions">
+                <span class="confirm-label">Transférer au mois suivant ?</span>
+                <button (click)="transferer(item)">Confirmer</button>
+                <button class="cancel" (click)="confirmTransfert = false">Non</button>
+              </div>
+            }
           </div>
         }
       }
     </div>
 
-    @if (pointedItems.length > 0) {
+    @if (pointedItems().length > 0) {
       <div class="pointed-section">
         <h4>Pointées</h4>
-        @for (item of pointedItems; track item.ligne) {
+        @for (item of pointedItems(); track item.ligne) {
           <div class="item pointed">
             <div class="circle checked"><span>✓</span></div>
             <div class="info">

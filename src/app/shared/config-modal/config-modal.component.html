@@ -50,7 +50,7 @@
           <button class="btn-reset" (click)="resetUrl()">Remettre par défaut</button>
         }
       </div>
-      @if (serverSaved) {
+      @if (serverSaved()) {
         <p class="success">Paramètres enregistrés</p>
       }
     </section>
@@ -67,8 +67,8 @@
           [password]="password"
         />
       </div>
-      <button class="btn-diag" (click)="runDiag()" [disabled]="diagWidget?.diagRunning || !canDiag">
-        {{ diagWidget?.diagRunning ? 'Test en cours…' : 'Lancer le diagnostic' }}
+      <button class="btn-diag" (click)="runDiag()" [disabled]="diagWidget?.diagRunning() || !canDiag">
+        {{ diagWidget?.diagRunning() ? 'Test en cours…' : 'Lancer le diagnostic' }}
       </button>
     </section>
 

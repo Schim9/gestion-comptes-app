@@ -9,8 +9,14 @@ export interface Toast {
 export class ToastService {
   toast = signal<Toast | null>(null);
 
+  private dismissTimer: ReturnType<typeof setTimeout> | null = null;
+
   show(message: string, type: 'success' | 'error' = 'success'): void {
+    if (this.dismissTimer) clearTimeout(this.dismissTimer);
     this.toast.set({ message, type });
-    setTimeout(() => this.toast.set(null), 3500);
+    this.dismissTimer = setTimeout(() => {
+      this.toast.set(null);
+      this.dismissTimer = null;
+    }, 3500);
   }
 }

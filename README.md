@@ -52,14 +52,14 @@ Le résultat du build (dossier `dist/`) est à déployer sur un serveur web stat
 Au premier accès, l'application affiche un formulaire de connexion (identifiant / mot de passe).
 
 - Le token JWT retourné est stocké en `localStorage` pour persister entre les sessions (comportement PWA).
-- Un **widget de diagnostic** est disponible sur cette page : il effectue 3 vérifications HTTP séquentielles pour valider la connectivité avec le back-end avant même de tenter une connexion.
+- Un **widget de diagnostic** est disponible sur cette page : il effectue 2 vérifications HTTP pour valider la connectivité avec le back-end avant même de tenter une connexion (état du serveur + credentials).
 
 ### 2. Configuration de l'URL API (`/config` ou modal `⚙`)
 
 Si l'URL du back-end change (ex : accès depuis l'extérieur vs. réseau local), elle se modifie sans rebuild :
 
 - Via la page `/config` accessible sans authentification.
-- Via le bouton `⚙` en haut à droite de l'application une fois connecté — ce bouton ouvre un modal qui permet aussi de relancer le diagnostic de connectivité.
+- Via le bouton `⚙` en haut à droite de l'application une fois connecté — ce bouton ouvre un modal qui permet aussi de saisir les credentials (pour le diagnostic), de choisir l'onglet ouvert par défaut au démarrage, et de relancer le diagnostic de connectivité.
 
 L'URL est persistée en `localStorage`.
 
@@ -111,7 +111,6 @@ Permet de **pointer les opérations prévisionnelles** — c'est-à-dire de vali
 
 - La liste affiche uniquement les opérations non encore pointées.
 - Un clic sur une opération ouvre un formulaire inline pour renseigner la **date réelle**, le **libellé définitif** et le **montant exact**.
-- Une option "Déduire des courses" est disponible pour les opérations concernées.
 - Une fois pointée, l'opération bascule dans la liste "Pointées ce mois-ci" (affichée en dessous).
 - Un champ de recherche permet de filtrer les opérations par libellé.
 

@@ -28,6 +28,7 @@ export interface OperationRequest {
   montant: number;
   dejaDebite: boolean;
   date: string | null;
+  deduireDesCourses?: boolean;
 }
 
 export interface OperationResponse {
@@ -38,6 +39,6 @@ export interface OperationResponse {
 export interface UpdateOperationRequest {
   libelle: string;
   date: string | null;
-  montant: number;
+  montant: number | null;
   compte: 'CCM' | 'Boursorama';
 }

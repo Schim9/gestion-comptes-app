@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, inject } from '@angular/core';
+import { Component, Output, EventEmitter, inject, input, signal, computed, effect } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SheetsService } from '../../../core/sheets.service';
@@ -12,10 +12,10 @@ import { Operation, UpdateOperationRequest } from '../../../core/models';
   templateUrl: './edition.component.html',
   styleUrl: './edition.component.scss'
 })
-export class EditionComponent implements OnChanges {
-  @Input() monthKey = '';
-  @Input() operationsReelles: Operation[] = [];
-  @Input() operationsPrevisionnelles: Operation[] = [];
+export class EditionComponent {
+  monthKey                 = input('');
+  operationsReelles        = input<Operation[]>([]);
+  operationsPrevisionnelles = input<Operation[]>([]);
 
   @Output() operationModifiee = new EventEmitter<void>();
 
@@ -24,9 +24,9 @@ export class EditionComponent implements OnChanges {
   private toast = inject(ToastService);
 
   selectedOperation: Operation | null = null;
-  loading = false;
-  filterText = '';
-  confirmAction: 'depointer' | 'supprimer' | null = null;
+  loading    = signal(false);
+  filterText = signal('');
+  confirmAction: 'depointer' | 'supprimer' | 'vider' | null = null;
 
   form = this.fb.group({
     libelle: ['', Validators.required],
@@ -36,26 +36,39 @@ export class EditionComponent implements OnChanges {
     date: [null as number | null]
   });
 
-  get aVenirOps(): Operation[] {
-    return this.operationsPrevisionnelles.filter(op => op.type === 'a_venir');
-  }
+  private aVenirOps = computed(() =>
+    this.operationsPrevisionnelles().filter(op => op.type === 'a_venir')
+  );
 
-  get filteredReelles(): Operation[] {
-    const q = this.filterText.trim().toLowerCase();
-    const ops = q ? this.operationsReelles.filter(op => op.libelle.toLowerCase().includes(q)) : this.operationsReelles;
+  filteredReelles = computed(() => {
+    const q = this.filterText().trim().toLowerCase();
+    const ops = q ? this.operationsReelles().filter(op => op.libelle.toLowerCase().includes(q)) : this.operationsReelles();
     return [...ops].sort((a, b) => b.ligne - a.ligne);
-  }
+  });
 
-  get filteredAVenir(): Operation[] {
-    const q = this.filterText.trim().toLowerCase();
-    const ops = q ? this.aVenirOps.filter(op => op.libelle.toLowerCase().includes(q)) : this.aVenirOps;
+  filteredAVenir = computed(() => {
+    const q = this.filterText().trim().toLowerCase();
+    const ops = q ? this.aVenirOps().filter(op => op.libelle.toLowerCase().includes(q)) : this.aVenirOps();
     return [...ops].sort((a, b) => b.ligne - a.ligne);
-  }
+  });
 
-  ngOnChanges(): void {
-    this.selectedOperation = null;
-    this.filterText = '';
-    this.form.reset({ sens: 'debit', compte: 'CCM' });
+  filteredRecurrents = computed(() => {
+    const q = this.filterText().trim().toLowerCase();
+    const ops = this.operationsPrevisionnelles().filter(op => op.type === 'recurrent');
+    const filtered = q ? ops.filter(op => op.libelle.toLowerCase().includes(q)) : ops;
+    return [...filtered].sort((a, b) => a.ligne - b.ligne);
+  });
+
+  constructor() {
+    effect(() => {
+      this.monthKey();
+      this.operationsReelles();
+      this.operationsPrevisionnelles();
+      this.selectedOperation = null;
+      this.confirmAction = null;
+      this.filterText.set('');
+      this.form.reset({ sens: 'debit', compte: 'CCM' });
+    }, { allowSignalWrites: true });
   }
 
   selectOperation(op: Operation): void {
@@ -81,6 +94,10 @@ export class EditionComponent implements OnChanges {
     return !op.type;
   }
 
+  isRecurrent(op: Operation): boolean {
+    return op.type === 'recurrent';
+  }
+
   submit(): void {
     if (this.form.invalid || !this.selectedOperation) return;
     const v = this.form.value;
@@ -93,17 +110,17 @@ export class EditionComponent implements OnChanges {
       compte: v.compte as 'CCM' | 'Boursorama'
     };
 
-    this.loading = true;
-    this.sheets.updateOperation(this.monthKey, this.selectedOperation.ligne, req).subscribe({
+    this.loading.set(true);
+    this.sheets.updateOperation(this.monthKey(), this.selectedOperation.ligne, req).subscribe({
       next: () => {
-        this.loading = false;
+        this.loading.set(false);
         this.toast.show(`"${req.libelle}" modifié`);
         this.selectedOperation = null;
         this.form.reset({ sens: 'debit', compte: 'CCM' });
         this.operationModifiee.emit();
       },
       error: () => {
-        this.loading = false;
+        this.loading.set(false);
         this.toast.show('Erreur lors de la modification', 'error');
       }
     });
@@ -115,7 +132,7 @@ export class EditionComponent implements OnChanges {
     this.form.reset({ sens: 'debit', compte: 'CCM' });
   }
 
-  requestConfirm(action: 'depointer' | 'supprimer'): void {
+  requestConfirm(action: 'depointer' | 'supprimer' | 'vider'): void {
     this.confirmAction = action;
   }
 
@@ -128,14 +145,36 @@ export class EditionComponent implements OnChanges {
     const op = this.selectedOperation;
     const action = this.confirmAction;
 
-    this.loading = true;
+    this.loading.set(true);
+
+    if (action === 'vider') {
+      this.sheets.updateOperation(this.monthKey(), op.ligne, {
+        libelle: op.libelle, date: null, montant: null, compte: op.compte
+      }).subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.toast.show(`Montant de "${op.libelle}" vidé`);
+          this.selectedOperation = null;
+          this.confirmAction = null;
+          this.form.reset({ sens: 'debit', compte: 'CCM' });
+          this.operationModifiee.emit();
+        },
+        error: () => {
+          this.loading.set(false);
+          this.toast.show('Erreur lors du vidage', 'error');
+          this.confirmAction = null;
+        }
+      });
+      return;
+    }
+
     const call$ = action === 'supprimer'
-      ? this.sheets.deleteOperation(this.monthKey, op.ligne)
-      : this.sheets.depointeOperation(this.monthKey, op.ligne);
+      ? this.sheets.deleteOperation(this.monthKey(), op.ligne)
+      : this.sheets.depointeOperation(this.monthKey(), op.ligne);
 
     call$.subscribe({
       next: () => {
-        this.loading = false;
+        this.loading.set(false);
         const msg = action === 'supprimer'
           ? `"${op.libelle}" supprimé`
           : `"${op.libelle}" dépointé — remis en "à venir"`;
@@ -146,7 +185,7 @@ export class EditionComponent implements OnChanges {
         this.operationModifiee.emit();
       },
       error: () => {
-        this.loading = false;
+        this.loading.set(false);
         this.toast.show('Erreur lors de l\'opération', 'error');
         this.confirmAction = null;
       }

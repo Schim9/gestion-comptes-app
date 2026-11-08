@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, signal, Injector, afterNextRender } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
@@ -19,11 +19,13 @@ export class LoginComponent implements OnInit {
 
   @ViewChild(DiagnosticWidgetComponent) diagWidget?: DiagnosticWidgetComponent;
 
+  private injector = inject(Injector);
+
   inputUrl      = this.config.getBaseUrl();
   inputUsername = this.config.getCredentials()?.username ?? '';
   inputPassword = this.config.getCredentials()?.password ?? '';
 
-  loading = false;
+  loading = signal(false);
   error   = '';
 
   diagVisible = false;
@@ -31,31 +33,30 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     const creds = this.config.getCredentials();
     if (creds && !this.auth.isAuthenticated()) {
-      this.loading = true;
+      this.loading.set(true);
       this.auth.login(creds.username, creds.password).subscribe({
         next: () => this.router.navigate(['/comptes']),
-        error: () => { this.loading = false; }
+        error: () => { this.loading.set(false); }
       });
     }
   }
 
   save(): void {
     if (!this.inputUsername || !this.inputPassword) return;
-    this.config.setApiUrl(this.inputUrl);
-    this.config.setCredentials(this.inputUsername, this.inputPassword);
-    this.loading = true;
+    this.config.saveServerConfig(this.inputUrl, this.inputUsername, this.inputPassword);
+    this.loading.set(true);
     this.error = '';
     this.auth.login(this.inputUsername, this.inputPassword).subscribe({
       next: () => this.router.navigate(['/comptes']),
       error: () => {
         this.error = 'Connexion échouée — vérifiez l\'URL et les identifiants';
-        this.loading = false;
+        this.loading.set(false);
       }
     });
   }
 
   runDiag(): void {
     this.diagVisible = true;
-    setTimeout(() => this.diagWidget?.run());
+    afterNextRender(() => this.diagWidget?.run(), { injector: this.injector });
   }
 }

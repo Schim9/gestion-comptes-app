@@ -35,9 +35,11 @@ export class SheetsService {
     return this.http.post<void>(`${this.base}/${monthKey}/depointer-reel/${ligne}`, {});
   }
 
-  pointerOperation(monthKey: string, ligne: number, date: string, libelle: string, montant: string, deduireDesCourses = false): Observable<void> {
-    const body: Record<string, string> = { date, libelle, montant };
-    if (deduireDesCourses) body['deduireDesCourses'] = 'true';
-    return this.http.post<void>(`${this.base}/${monthKey}/pointer/${ligne}`, body);
+  transfererOperation(monthKey: string, ligne: number): Observable<{ targetMonth: string }> {
+    return this.http.post<{ targetMonth: string }>(`${this.base}/${monthKey}/operations/${ligne}/transferer`, {});
+  }
+
+  pointerOperation(monthKey: string, ligne: number, date: string, libelle: string, montant: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/${monthKey}/pointer/${ligne}`, { date, libelle, montant });
   }
 }

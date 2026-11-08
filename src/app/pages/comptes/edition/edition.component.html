@@ -5,7 +5,7 @@
     <input
       type="text"
       placeholder="Rechercher une opération…"
-      [(ngModel)]="filterText"
+      [ngModel]="filterText()" (ngModelChange)="filterText.set($event)"
       class="filter-input"
     />
   </div>
@@ -13,10 +13,10 @@
   <!-- Opérations réelles -->
   <section class="group">
     <h3 class="group-title">Opérations réelles</h3>
-    @if (filteredReelles.length === 0) {
+    @if (filteredReelles().length === 0) {
       <p class="empty">Aucune opération réelle</p>
     } @else {
-      @for (op of filteredReelles; track op.ligne) {
+      @for (op of filteredReelles(); track op.ligne) {
         <div class="item" [class.selected]="selectedOperation?.ligne === op.ligne" (click)="selectOperation(op)">
           <div class="info">
             <span class="libelle">{{ op.libelle }}</span>
@@ -33,10 +33,30 @@
   <!-- Mouvements à venir -->
   <section class="group">
     <h3 class="group-title">Mouvements à venir</h3>
-    @if (filteredAVenir.length === 0) {
+    @if (filteredAVenir().length === 0) {
       <p class="empty">Aucun mouvement à venir</p>
     } @else {
-      @for (op of filteredAVenir; track op.ligne) {
+      @for (op of filteredAVenir(); track op.ligne) {
+        <div class="item" [class.selected]="selectedOperation?.ligne === op.ligne" (click)="selectOperation(op)">
+          <div class="info">
+            <span class="libelle">{{ op.libelle }}</span>
+            <span class="meta">{{ op.compte }}</span>
+          </div>
+          <span class="amount" [class.debit]="op.montant < 0" [class.credit]="op.montant > 0">
+            {{ op.montant | number:'1.2-2' }} €
+          </span>
+        </div>
+      }
+    }
+  </section>
+
+  <!-- Mouvements récurrents -->
+  <section class="group">
+    <h3 class="group-title">Mouvements récurrents</h3>
+    @if (filteredRecurrents().length === 0) {
+      <p class="empty">Aucun mouvement récurrent</p>
+    } @else {
+      @for (op of filteredRecurrents(); track op.ligne) {
         <div class="item" [class.selected]="selectedOperation?.ligne === op.ligne" (click)="selectOperation(op)">
           <div class="info">
             <span class="libelle">{{ op.libelle }}</span>
@@ -97,8 +117,8 @@
       </div>
 
       <div class="form-actions">
-        <button type="submit" [disabled]="form.invalid || loading">
-          {{ loading ? 'Enregistrement…' : 'Sauvegarder' }}
+        <button type="submit" [disabled]="form.invalid || loading()">
+          {{ loading() ? 'Enregistrement…' : 'Sauvegarder' }}
         </button>
         <button type="button" class="cancel" (click)="cancel()">Annuler</button>
       </div>
@@ -112,6 +132,10 @@
           <button class="danger-btn" (click)="requestConfirm('depointer')">
             ↩ Dépointer
           </button>
+        } @else if (isRecurrent(selectedOperation)) {
+          <button class="danger-btn" (click)="requestConfirm('vider')">
+            ⌫ Vider le montant
+          </button>
         } @else {
           <button class="danger-btn" (click)="requestConfirm('supprimer')">
             🗑 Supprimer
@@ -119,10 +143,10 @@
         }
       } @else {
         <span class="confirm-label">
-          {{ confirmAction === 'supprimer' ? 'Supprimer définitivement ?' : 'Remettre en "à venir" ?' }}
+          {{ confirmAction === 'supprimer' ? 'Supprimer définitivement ?' : confirmAction === 'vider' ? 'Vider le montant ?' : 'Remettre en "à venir" ?' }}
         </span>
         <button class="confirm-btn" [disabled]="loading" (click)="confirmAndExecute()">
-          {{ loading ? '…' : 'Confirmer' }}
+          {{ loading() ? '…' : 'Confirmer' }}
         </button>
         <button class="cancel-confirm-btn" (click)="cancelConfirm()">Non</button>
       }

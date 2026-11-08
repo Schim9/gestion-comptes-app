@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ViewChild, inject } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfigService, DefaultTab } from '../../core/config.service';
 import { DiagnosticWidgetComponent } from '../diagnostic-widget/diagnostic-widget.component';
@@ -21,7 +21,7 @@ export class ConfigModalComponent {
 
   inputUrl = this.config.getBaseUrl();
   isCustom = this.config.isCustomUrl();
-  serverSaved = false;
+  serverSaved = signal(false);
 
   defaultTab: DefaultTab = this.config.getDefaultTab();
 
@@ -35,15 +35,10 @@ export class ConfigModalComponent {
   close(): void { this.closed.emit(); }
 
   saveServer(): void {
-    this.config.setApiUrl(this.inputUrl);
+    this.config.saveServerConfig(this.inputUrl, this.username, this.password);
     this.isCustom = this.config.isCustomUrl();
-    if (this.username) {
-      this.config.setCredentials(this.username, this.password);
-    } else {
-      this.config.clearCredentials();
-    }
-    this.serverSaved = true;
-    setTimeout(() => this.serverSaved = false, 2000);
+    this.serverSaved.set(true);
+    setTimeout(() => this.serverSaved.set(false), 2000);
   }
 
   saveDefaultTab(): void { this.config.setDefaultTab(this.defaultTab); }
@@ -52,7 +47,7 @@ export class ConfigModalComponent {
     this.config.reset();
     this.inputUrl = this.config.getBaseUrl();
     this.isCustom = false;
-    this.serverSaved = false;
+    this.serverSaved.set(false);
   }
 
   runDiag(): void {

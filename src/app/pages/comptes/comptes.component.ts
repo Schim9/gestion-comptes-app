@@ -1,6 +1,7 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, inject, signal, computed, DestroyRef } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subject, switchMap, catchError, EMPTY } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SheetsService } from '../../core/sheets.service';
 import { AuthService } from '../../core/auth.service';
 import { ConfigService } from '../../core/config.service';
@@ -18,7 +19,7 @@ type Tab = 'consultation' | 'saisie' | 'pointage' | 'edition';
 @Component({
   selector: 'app-comptes',
   standalone: true,
-  imports: [CommonModule, ToastComponent, ConfigModalComponent, ConsultationComponent, SaisieComponent, PointageComponent, EditionComponent],
+  imports: [ToastComponent, ConfigModalComponent, ConsultationComponent, SaisieComponent, PointageComponent, EditionComponent],
   templateUrl: './comptes.component.html',
   styleUrl: './comptes.component.scss'
 })
@@ -26,6 +27,7 @@ export class ComptesComponent implements OnInit, OnDestroy {
   private sheets = inject(SheetsService);
   private auth = inject(AuthService);
   private config = inject(ConfigService);
+  private destroyRef = inject(DestroyRef);
 
   currentMonth = signal(currentMonthKey());
   monthData = signal<MonthData | null>(null);
@@ -33,7 +35,9 @@ export class ComptesComponent implements OnInit, OnDestroy {
   loading = signal(false);
   showConfig = signal(false);
 
-  monthLabel = () => monthKeyToLabel(this.currentMonth());
+  monthLabel = computed(() => monthKeyToLabel(this.currentMonth()));
+
+  private monthChange$ = new Subject<void>();
 
   private readonly onVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
@@ -42,6 +46,23 @@ export class ComptesComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    this.monthChange$.pipe(
+      switchMap(() => {
+        this.loading.set(true);
+        this.monthData.set(null);
+        return this.sheets.getMonth(this.currentMonth()).pipe(
+          catchError((err: HttpErrorResponse) => {
+            if (err.status === 404) this.monthData.set(null);
+            this.loading.set(false);
+            return EMPTY;
+          })
+        );
+      }),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(data => {
+      this.monthData.set(data);
+      this.loading.set(false);
+    });
     this.loadMonth();
     document.addEventListener('visibilitychange', this.onVisibilityChange);
   }
@@ -72,17 +93,6 @@ export class ComptesComponent implements OnInit, OnDestroy {
   }
 
   loadMonth(): void {
-    this.loading.set(true);
-    this.monthData.set(null);
-    this.sheets.getMonth(this.currentMonth()).subscribe({
-      next: data => {
-        this.monthData.set(data);
-        this.loading.set(false);
-      },
-      error: (err: HttpErrorResponse) => {
-        if (err.status === 404) this.monthData.set(null);
-        this.loading.set(false);
-      }
-    });
+    this.monthChange$.next();
   }
 }

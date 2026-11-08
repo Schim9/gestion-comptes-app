@@ -2,7 +2,7 @@
   <div class="login-card">
     <h1>Comptes Famille</h1>
 
-    @if (loading) {
+    @if (loading()) {
       <p class="connecting">Connexion en cours…</p>
     } @else {
       <div class="field">
@@ -41,7 +41,7 @@
         <button class="btn-save" (click)="save()" [disabled]="!inputUsername || !inputPassword">
           Enregistrer
         </button>
-        <button class="btn-diag" (click)="runDiag()" [disabled]="diagWidget?.diagRunning">
+        <button class="btn-diag" (click)="runDiag()" [disabled]="diagWidget?.diagRunning()">
           Diagnostic
         </button>
       </div>

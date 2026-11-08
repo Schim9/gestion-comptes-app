@@ -1,4 +1,4 @@
-@for (check of checks; track check.label) {
+@for (check of checks(); track check.label) {
   <div class="diag-row">
     <span class="diag-icon" [class]="check.status">
       @switch (check.status) {

@@ -18,10 +18,16 @@ export class DiagnosticService {
     return baseUrl ? `${baseUrl.trim().replace(/\/$/, '').replace(/\/api$/, '')}/api` : this.config.getApiUrl();
   }
 
-  checkHealth(baseUrl?: string): Observable<DiagResult> {
-    return this.http.get<{ status: string }>(`${this.apiUrl(baseUrl)}/status`).pipe(
-      map(r => r.status === 'up' ? { ok: true } : { ok: false, message: 'Serveur dégradé' }),
-      catchError(err => of({ ok: false, message: `Serveur inaccessible (${err.status || err.message})` }))
+  checkStatus(baseUrl?: string): Observable<{ health: DiagResult; sheets: DiagResult }> {
+    return this.http.get<{ status: string; anomalies: string[] }>(`${this.apiUrl(baseUrl)}/status`).pipe(
+      map(r => ({
+        health: r.status === 'up' ? { ok: true } : { ok: false, message: 'Serveur dégradé' },
+        sheets: (r.anomalies?.length ?? 0) === 0 ? { ok: true } : { ok: false, message: r.anomalies[0] }
+      })),
+      catchError(err => of({
+        health: { ok: false, message: `Serveur inaccessible (${err.status || err.message})` },
+        sheets: { ok: false, message: 'Non vérifié (serveur inaccessible)' }
+      }))
     );
   }
 
@@ -29,15 +35,6 @@ export class DiagnosticService {
     return this.http.post<{ token: string }>(`${this.apiUrl(baseUrl)}/auth/login`, { username, password }).pipe(
       map(() => ({ ok: true })),
       catchError(() => of({ ok: false, message: 'Identifiants incorrects' }))
-    );
-  }
-
-  checkSheets(baseUrl?: string): Observable<DiagResult> {
-    return this.http.get<{ anomalies: string[] }>(`${this.apiUrl(baseUrl)}/status`).pipe(
-      map(r => r.anomalies.length === 0
-        ? { ok: true }
-        : { ok: false, message: r.anomalies[0] }),
-      catchError(err => of({ ok: false, message: `Erreur Google Sheets (${err.status})` }))
     );
   }
 }

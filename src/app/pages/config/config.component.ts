@@ -1,5 +1,4 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ConfigService, DefaultTab } from '../../core/config.service';
@@ -8,7 +7,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-config',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './config.component.html',
   styleUrl: './config.component.scss'
 })
@@ -19,7 +18,7 @@ export class ConfigComponent {
 
   inputUrl = this.config.getBaseUrl();
   isCustom = this.config.isCustomUrl();
-  saved = false;
+  saved = signal(false);
 
   inputUsername = this.config.getCredentials()?.username ?? '';
   inputPassword = this.config.getCredentials()?.password ?? '';
@@ -27,22 +26,17 @@ export class ConfigComponent {
   inputDefaultTab: DefaultTab = this.config.getDefaultTab();
 
   save(): void {
-    this.config.setApiUrl(this.inputUrl);
+    this.config.saveServerConfig(this.inputUrl, this.inputUsername, this.inputPassword);
     this.isCustom = this.config.isCustomUrl();
-    if (this.inputUsername) {
-      this.config.setCredentials(this.inputUsername, this.inputPassword);
-    } else {
-      this.config.clearCredentials();
-    }
     this.config.setDefaultTab(this.inputDefaultTab);
-    this.saved = true;
-    setTimeout(() => this.saved = false, 2000);
+    this.saved.set(true);
+    setTimeout(() => this.saved.set(false), 2000);
   }
 
   reset(): void {
     this.config.reset();
     this.inputUrl = this.config.getBaseUrl();
     this.isCustom = false;
-    this.saved = false;
+    this.saved.set(false);
   }
 }

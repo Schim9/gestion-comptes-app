@@ -57,7 +57,7 @@ export class SaisieComponent implements OnInit {
       montant: montantSigne,
       dejaDebite: v.dejaDebite ?? false,
       date: v.dejaDebite ? String(v.date) : null,
-      deduireDesCourses: v.dejaDebite ? (v.deduireDesCourses ?? false) : false
+      deduireDesCourses: v.deduireDesCourses ?? false
     };
 
     this.loading.set(true);
@@ -65,7 +65,7 @@ export class SaisieComponent implements OnInit {
       next: res => {
         this.loading.set(false);
         const label = res.created
-          ? `Mois de ${this.monthKey} créé dans le Google Sheet`
+          ? `Mois de ${this.monthKey()} créé dans le Google Sheet`
           : 'Opération enregistrée';
         this.toast.show(label);
         sessionStorage.removeItem(DRAFT_KEY);

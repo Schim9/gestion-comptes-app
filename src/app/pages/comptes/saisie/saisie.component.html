@@ -37,11 +37,12 @@
         <label>Date de l'opération *</label>
         <input formControlName="date" type="number" min="1" max="31" placeholder="Jour (ex: 15)" />
       </div>
-      <div class="checkbox-row">
-        <input type="checkbox" formControlName="deduireDesCourses" id="deduireDesCourses" />
-        <label for="deduireDesCourses">Déduire des courses</label>
-      </div>
     }
+
+    <div class="checkbox-row">
+      <input type="checkbox" formControlName="deduireDesCourses" id="deduireDesCourses" />
+      <label for="deduireDesCourses">Déduire des courses</label>
+    </div>
 
     <button type="submit" [disabled]="form.invalid || loading()">
       {{ loading() ? 'Enregistrement…' : 'Enregistrer' }}

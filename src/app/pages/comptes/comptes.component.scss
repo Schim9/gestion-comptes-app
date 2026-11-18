@@ -9,6 +9,11 @@
   background: #83d087;
   color: white;
   padding: .75rem .75rem;
+  padding-top: calc(.75rem + env(safe-area-inset-top, 0px));
+
+  @media (display-mode: standalone) {
+    padding-top: max(env(safe-area-inset-top, 0px), 28px);
+  }
   display: flex;
   align-items: center;
   justify-content: space-between;
